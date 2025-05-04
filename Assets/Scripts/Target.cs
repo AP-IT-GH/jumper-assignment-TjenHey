@@ -6,7 +6,7 @@ public class Target : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public bool isReward = false;
     public float moveSpeed = 10f;
-    void Start()
+    void Awake()
     {
         isReward = Random.Range(0, 2) == 0;
         if (!isReward)

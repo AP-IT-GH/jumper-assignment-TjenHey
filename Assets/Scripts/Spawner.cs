@@ -4,11 +4,12 @@ public class Spawner : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public GameObject prefab;
-    public Vector3 spawnLocation;
+    public GameObject target;
+    private Vector3 _spawnLocation;
     public int spawnCount = 0;
     void Start()
     {
-        
+        _spawnLocation = target.transform.position;
     }
 
     // Update is called once per frame
@@ -20,6 +21,6 @@ public class Spawner : MonoBehaviour
     public GameObject Spawn()
     {
         spawnCount++;
-        return Instantiate(prefab, spawnLocation, Quaternion.identity);
+        return Instantiate(prefab, _spawnLocation, Quaternion.identity);
     }
 }
