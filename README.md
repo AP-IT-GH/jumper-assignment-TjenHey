@@ -29,4 +29,4 @@ Reward voor een groen blokje aangepast naar 0.01 en punishment bleef -1 voor een
 Hierbij hebben we de rewards terug gelijkgezet aan de punishemnt zoals in poging 1, maar eindigden we de episode na elk blokje, hierna ging het beter maar bleef hij vaak gewoon willekeurig springen.
 ### Poging 4
 Hier begonnen we te experimenteren met twee hyperparameters: batch_size en buffer_size. We merkten dat ze nogal laag stonden dus we hebben ze hard verhoogd, wat een goed resultaat opleverde. Zoals hieronder te zien hebben we een aantal verschillende waardes geprobeerd, maar we zijn uiteindelijk beland op 256 batch_size en 2048 buffer_size.
-![[./Images/jumper_graph.png]]
+![Graph](Images/jumper_graph.png)
