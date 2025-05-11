@@ -10,29 +10,35 @@ public class Jumper : Agent
 {
     public Transform target;
     private bool _isReward = false;
-    public Vector3 startPosition;
-    public Vector3 targetStartPosition;
     public Spawner spawner;
     private Vector3 _targetPosition;
     private bool _grounded = true;
     public float jumpForce;
+    private Vector3 _spawnLocation;
+    private float _targetSpeed;
+    private void Start()
+    {
+        _spawnLocation = transform.position;
+    }
+
     public override void OnEpisodeBegin()
     {
         this.gameObject.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
         _isReward = target.gameObject.GetComponent<Target>().isReward;
-        this.transform.localPosition = startPosition;
-        target.localPosition = targetStartPosition;
-        _targetPosition = target.localPosition;
         _grounded = true;
+        Spawn();
+        this.transform.position = _spawnLocation;
     }
     public override void CollectObservations(VectorSensor sensor)
     {
         sensor.AddObservation(_targetPosition);
         sensor.AddObservation(this.transform.localPosition);
         sensor.AddObservation(_isReward);
+        sensor.AddObservation(_targetSpeed);
     }
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
+        UpdateTarget();
         if (spawner.spawnCount > 200)
         {
             EndEpisode();
@@ -48,8 +54,7 @@ public class Jumper : Agent
             this.gameObject.GetComponent<Rigidbody>().AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
             _grounded = false;
         }
-        _targetPosition = target.localPosition;
-        if (_targetPosition.x < this.transform.position.x - 2)
+        if (_targetPosition.x < this.transform.localPosition.x - 2)
         {
             if (_isReward)
             {
@@ -59,6 +64,43 @@ public class Jumper : Agent
             else
             {
                 SetReward(1f);
+                EndEpisode();
+            }
+            Spawn();
+        }
+    }
+
+    private void Spawn()
+    {
+        spawner.Spawn();
+        spawner.spawnCount++;
+    }
+    private void UpdateTarget()
+    {
+        _isReward = target.gameObject.GetComponent<Target>().isReward;
+        _targetPosition = target.localPosition;
+        _targetSpeed = target.gameObject.GetComponent<Target>().moveSpeed;
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            _grounded = true;
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Target")){
+            if (_isReward)
+            {
+                SetReward(1f);
+                EndEpisode();
+            }
+            else
+            {
+                SetReward(-1f);
+                EndEpisode();
             }
             Spawn();
         }
@@ -71,33 +113,5 @@ public class Jumper : Agent
         {
             discreteActionsOut[0] = 1;
         }
-    }
-
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.CompareTag("Target")){
-            if (_isReward)
-            {
-                SetReward(1f);
-            }
-            else
-            {
-                SetReward(-1f);
-                EndEpisode();
-            }
-            Spawn();
-        }
-        else if (other.gameObject.CompareTag("Ground"))
-        {
-            _grounded = true;
-        }
-    }
-
-    private void Spawn()
-    {
-        Destroy(target.gameObject);
-        target = spawner.Spawn().transform;
-        _targetPosition = target.localPosition;
-        _isReward = target.gameObject.GetComponent<Target>().isReward;
     }
 }

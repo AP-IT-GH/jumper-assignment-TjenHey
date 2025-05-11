@@ -3,13 +3,12 @@ using UnityEngine;
 public class Spawner : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public GameObject prefab;
     public GameObject target;
     private Vector3 _spawnLocation;
     public int spawnCount = 0;
     void Start()
     {
-        _spawnLocation = target.transform.position;
+        _spawnLocation = target.transform.localPosition;
     }
 
     // Update is called once per frame
@@ -18,9 +17,9 @@ public class Spawner : MonoBehaviour
         
     }
 
-    public GameObject Spawn()
+    public void Spawn()
     {
-        spawnCount++;
-        return Instantiate(prefab, _spawnLocation, Quaternion.identity);
+        target.transform.localPosition = _spawnLocation;
+        target.GetComponent<Target>().UpdateState();
     }
 }
